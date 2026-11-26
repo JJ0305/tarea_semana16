@@ -17,6 +17,17 @@ pipeline {
         stage('Preparar despliegue') {
             steps {
                 checkout scm
+                script {
+                    def gitAuthor = sh(
+                        script: 'git log -1 --format=%an',
+                        returnStdout: true
+                    ).trim().replaceAll(/[\r\n<>&"']/, ' ')
+                    def gitCommit = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                    currentBuild.description = "Autor del commit: ${gitAuthor} | ${gitCommit}"
+                }
                 withCredentials([
                     usernamePassword(credentialsId: 'ghcr-readonly', usernameVariable: 'GHCR_USER', passwordVariable: 'GHCR_TOKEN'),
                     string(credentialsId: 'calificada16-db-password', variable: 'DB_PASSWORD'),
