@@ -47,7 +47,7 @@ pipeline {
             steps {
                 sh '''
                     for attempt in $(seq 1 30); do
-                      if curl --fail --silent http://localhost:${APP_PORT}/ > /dev/null; then
+                      if curl --fail --silent http://host.docker.internal:${APP_PORT}/ > /dev/null; then
                         echo "Aplicación disponible en http://localhost:${APP_PORT}"
                         exit 0
                       fi
