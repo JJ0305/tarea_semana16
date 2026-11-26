@@ -48,7 +48,7 @@ jobs:
         run: docker build -f frontend/Dockerfile -t calificada16-frontend:${{ github.sha }} .
 
       - name: Analizar vulnerabilidades de imágenes
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: calificada16-backend:${{ github.sha }}
           format: table
@@ -58,7 +58,7 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Analizar vulnerabilidades frontend
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: calificada16-frontend:${{ github.sha }}
           format: table
