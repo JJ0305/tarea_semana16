@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  build-test-analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Compilar y ejecutar pruebas
+        run: ./mvnw -B clean verify
+
+      - name: Analizar código con CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+          build-mode: manual
+
+      - name: Compilar para CodeQL
+        run: ./mvnw -B clean -DskipTests package
+
+      - name: Publicar resultados CodeQL
+        uses: github/codeql-action/analyze@v3
+
+      - name: Construir imagen backend
+        run: docker build -t calificada16-backend:${{ github.sha }} .
+
+      - name: Construir imagen frontend
+        run: docker build -f frontend/Dockerfile -t calificada16-frontend:${{ github.sha }} .
+
+      - name: Analizar vulnerabilidades de imágenes
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: calificada16-backend:${{ github.sha }}
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Analizar vulnerabilidades frontend
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: calificada16-frontend:${{ github.sha }}
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Iniciar sesión en GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publicar imágenes en GHCR
+        if: github.event_name != 'pull_request'
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          REGISTRY="ghcr.io/$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          docker tag calificada16-backend:${TAG} ${REGISTRY}/calificada16-backend:${TAG}
+          docker tag calificada16-frontend:${TAG} ${REGISTRY}/calificada16-frontend:${TAG}
+          docker tag calificada16-backend:${TAG} ${REGISTRY}/calificada16-backend:latest
+          docker tag calificada16-frontend:${TAG} ${REGISTRY}/calificada16-frontend:latest
+          docker push ${REGISTRY}/calificada16-backend:${TAG}
+          docker push ${REGISTRY}/calificada16-frontend:${TAG}
+          docker push ${REGISTRY}/calificada16-backend:latest
+          docker push ${REGISTRY}/calificada16-frontend:latest

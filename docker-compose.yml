@@ -1,0 +1,47 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: calificada16
+      MYSQL_USER: calificada16
+      MYSQL_PASSWORD: ${DB_PASSWORD:-calificada16}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root-local-only}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backend:
+    image: ${BACKEND_IMAGE:-calificada16-backend:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/calificada16?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: calificada16
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-calificada16}
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:-demo}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-demo1234}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-calificada16-frontend:local}
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

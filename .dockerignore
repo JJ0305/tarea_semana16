@@ -1,0 +1,7 @@
+target
+.git
+.github
+Jenkinsfile
+README.md
+HELP.md
+*.log
