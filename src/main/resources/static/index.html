@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestión de clientes</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><p class="eyebrow">PORTAL DE SERVICIO</p><h1>Gestión de clientes</h1></div>
+      <button id="logout" class="secondary hidden" type="button">Cerrar sesión</button>
+    </header>
+    <section id="login-panel" class="panel login-panel">
+      <h2>Iniciar sesión</h2>
+      <p>Ingresa con la cuenta de administración de este prototipo.</p>
+      <form id="login-form">
+        <label>Usuario<input name="username" autocomplete="username" required></label>
+        <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Entrar</button>
+      </form>
+    </section>
+    <section id="app-panel" class="hidden">
+      <p id="welcome" class="welcome"></p>
+      <div class="grid">
+        <section class="panel">
+          <h2>Registrar cliente</h2>
+          <form id="client-form">
+            <label>Nombre completo<input name="name" maxlength="120" required></label>
+            <label>Correo electrónico<input name="email" type="email" maxlength="180" required></label>
+            <label>Teléfono<input name="phone" maxlength="40"></label>
+            <button type="submit">Guardar cliente</button>
+          </form>
+        </section>
+        <section class="panel">
+          <h2>Crear solicitud</h2>
+          <form id="request-form">
+            <label>Cliente<select id="client-select" name="clientId" required><option value="">Selecciona un cliente</option></select></label>
+            <label>Asunto<input name="subject" maxlength="180" required></label>
+            <label>Descripción<textarea name="description" maxlength="2000" rows="3" required></textarea></label>
+            <button type="submit">Registrar solicitud</button>
+          </form>
+        </section>
+      </div>
+      <section class="panel list-panel">
+        <h2>Clientes registrados</h2>
+        <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th></tr></thead><tbody id="clients-body"></tbody></table></div>
+      </section>
+      <section class="panel list-panel">
+        <h2>Consulta de solicitudes</h2>
+        <div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Asunto</th><th>Descripción</th><th>Estado</th><th>Fecha</th></tr></thead><tbody id="requests-body"></tbody></table></div>
+      </section>
+    </section>
+    <p id="notice" role="status" aria-live="polite"></p>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
