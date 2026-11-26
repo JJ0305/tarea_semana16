@@ -51,7 +51,7 @@ El `Jenkinsfile` despliega a un entorno de prueba en el host/agente que ejecuta 
 | `calificada16-mysql-root-password` | Secret text | Contraseña root de MySQL |
 | `calificada16-admin-password` | Secret text | Contraseña de la cuenta administradora |
 
-Conecta el webhook de GitHub al job de Jenkins para iniciar el despliegue tras la publicación del pipeline CI. Al ejecutar Jenkins, especifica el propietario/organización GHCR en `GHCR_OWNER` y la etiqueta del commit en `IMAGE_TAG` (por ejemplo, el SHA publicado por Actions). Jenkins descarga las imágenes, levanta MySQL/API/frontend con Compose y comprueba la página en `http://localhost:8081`. La descripción del build muestra el autor y el SHA corto del último commit; ese autor proviene de Git y no autentica a quien disparó Jenkins.
+Conecta el webhook de GitHub al job de Jenkins para iniciar el despliegue tras la publicación del pipeline CI. Al ejecutar Jenkins, especifica el propietario/organización GHCR en `GHCR_OWNER` y la etiqueta del commit en `IMAGE_TAG` (por ejemplo, el SHA publicado por Actions). Jenkins descarga las imágenes, levanta MySQL/API/frontend con Compose y comprueba la página en `http://localhost:8082`. Se usa el puerto `8082` para no chocar con el entorno local, que por defecto usa `8081`. La descripción del build muestra el autor y el SHA corto del último commit; ese autor proviene de Git y no autentica a quien disparó Jenkins.
 
 Si Jenkins corre dentro de un contenedor, tener instalado `docker compose` no basta: el contenedor necesita el socket del daemon y permiso para usarlo. En el Compose que ejecuta Jenkins, monta el socket del host y añade al proceso el GID que posee ese socket:
 
@@ -68,7 +68,7 @@ Define `DOCKER_GID` con el GID del grupo propietario de `/var/run/docker.sock` e
 
 El mensaje `Started by user unknown or anonymous` es la identidad autenticada por Jenkins, no el autor del commit. Para que Jenkins identifique el usuario que dispara el build, configura una integración de GitHub/webhook que transmita al plugin de Jenkins la identidad del actor, o dispara el build con una cuenta autenticada de Jenkins. La descripción añadida por el pipeline permite ver el autor Git, pero no cambia ese mensaje de autenticación.
 
-El host de prueba debe permitir tráfico al puerto configurado (`8081` por defecto) y mantener persistente el volumen de Docker. En un entorno real, cambia los secretos de ejemplo, limita el acceso a Jenkins/puerto y configura TLS mediante un proxy inverso.
+El entorno local usa `8081` por defecto y Jenkins usa `8082`; permite tráfico al puerto que corresponda y mantén persistente el volumen de Docker. En un entorno real, cambia los secretos de ejemplo, limita el acceso a Jenkins/puerto y configura TLS mediante un proxy inverso.
 
 ## Pruebas locales
 
