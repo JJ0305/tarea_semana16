@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = 'calificada16-test'
-        APP_PORT = '8081'
+        APP_PORT = '8082'
         BACKEND_IMAGE = "ghcr.io/${params.GHCR_OWNER.toLowerCase()}/calificada16-backend:${params.IMAGE_TAG}"
         FRONTEND_IMAGE = "ghcr.io/${params.GHCR_OWNER.toLowerCase()}/calificada16-frontend:${params.IMAGE_TAG}"
     }
@@ -17,6 +17,17 @@ pipeline {
         stage('Preparar despliegue') {
             steps {
                 checkout scm
+                script {
+                    def gitAuthor = sh(
+                        script: 'git log -1 --format=%an',
+                        returnStdout: true
+                    ).trim().replaceAll(/[\r\n<>&"']/, ' ')
+                    def gitCommit = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                    currentBuild.description = "Autor del commit: ${gitAuthor} | ${gitCommit}"
+                }
                 withCredentials([
                     usernamePassword(credentialsId: 'ghcr-readonly', usernameVariable: 'GHCR_USER', passwordVariable: 'GHCR_TOKEN'),
                     string(credentialsId: 'calificada16-db-password', variable: 'DB_PASSWORD'),
