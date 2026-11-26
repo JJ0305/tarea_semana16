@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = 'calificada16-test'
-        APP_PORT = '8080'
+        APP_PORT = '8081'
         BACKEND_IMAGE = "ghcr.io/${params.GHCR_OWNER.toLowerCase()}/calificada16-backend:${params.IMAGE_TAG}"
         FRONTEND_IMAGE = "ghcr.io/${params.GHCR_OWNER.toLowerCase()}/calificada16-frontend:${params.IMAGE_TAG}"
     }

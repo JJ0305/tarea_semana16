@@ -10,7 +10,7 @@ Requiere Docker y Docker Compose:
 docker compose up --build
 ```
 
-Abre <http://localhost:8080>. Para la demostración local se crea el usuario `demo` con contraseña `demo1234`. Cambia estas credenciales antes de publicar o desplegar el prototipo. Se pueden configurar con `APP_ADMIN_USERNAME`, `APP_ADMIN_PASSWORD`, `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD`; también se puede cambiar el puerto con `APP_PORT`.
+Abre <http://localhost:8081>. Para la demostración local se crea el usuario `demo` con contraseña `demo1234`. Cambia estas credenciales antes de publicar o desplegar el prototipo. Se pueden configurar con `APP_ADMIN_USERNAME`, `APP_ADMIN_PASSWORD`, `DB_PASSWORD` y `MYSQL_ROOT_PASSWORD`; también se puede cambiar el puerto con `APP_PORT` (por defecto, `8081`).
 
 La aplicación crea las tablas de MySQL en el primer inicio y conserva los datos en el volumen `mysql_data`. Para apagarla sin borrar los datos:
 
@@ -51,9 +51,9 @@ El `Jenkinsfile` despliega a un entorno de prueba en el host/agente que ejecuta 
 | `calificada16-mysql-root-password` | Secret text | Contraseña root de MySQL |
 | `calificada16-admin-password` | Secret text | Contraseña de la cuenta administradora |
 
-Conecta el webhook de GitHub al job de Jenkins para iniciar el despliegue tras la publicación del pipeline CI. Al ejecutar Jenkins, especifica el propietario/organización GHCR en `GHCR_OWNER` y la etiqueta del commit en `IMAGE_TAG` (por ejemplo, el SHA publicado por Actions). Jenkins descarga las imágenes, levanta MySQL/API/frontend con Compose y comprueba la página en `http://localhost:8080`.
+Conecta el webhook de GitHub al job de Jenkins para iniciar el despliegue tras la publicación del pipeline CI. Al ejecutar Jenkins, especifica el propietario/organización GHCR en `GHCR_OWNER` y la etiqueta del commit en `IMAGE_TAG` (por ejemplo, el SHA publicado por Actions). Jenkins descarga las imágenes, levanta MySQL/API/frontend con Compose y comprueba la página en `http://localhost:8081`.
 
-El host de prueba debe permitir tráfico al puerto configurado y mantener persistente el volumen de Docker. En un entorno real, cambia los secretos de ejemplo, limita el acceso a Jenkins/puerto y configura TLS mediante un proxy inverso.
+El host de prueba debe permitir tráfico al puerto configurado (`8081` por defecto) y mantener persistente el volumen de Docker. En un entorno real, cambia los secretos de ejemplo, limita el acceso a Jenkins/puerto y configura TLS mediante un proxy inverso.
 
 ## Pruebas locales
 
